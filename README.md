@@ -194,13 +194,9 @@ data/
 tests/                      pytest (calculs, scénarios, interfaces)
 scripts/verifier_resultats.py
 docs/                       Mécanismes, guide du code, démo, questions/réponses
-tp/                         Énoncé de TP, corrigé et PDF
-rapport/                    Rapport du projet (PDF + sources HTML/CSS)
-presentation/               Slides, guide de présentation, plan et notes orales
-Resume_InsideTheFeed.pdf    Résumé du projet
 ```
 
-## Documents fournis
+## Documentation
 
 | Document | Contenu |
 |---|---|
@@ -208,10 +204,6 @@ Resume_InsideTheFeed.pdf    Résumé du projet
 | `docs/guide_code.md` | L'ordre de lecture du code |
 | `docs/demo.md` | Le scénario de démonstration (5–7 min) |
 | `docs/questions_professeur.md` | Questions probables et réponses |
-| `rapport/Rapport_InsideTheFeed.pdf` | Rapport complet du projet |
-| `presentation/Presentation_InsideTheFeed.pdf` | Diapositives |
-| `presentation/plan_et_notes.md` | Plan des slides et notes orales |
-| `tp/TP_InsideTheFeed.pdf` | TP pour reproduire le moteur, avec corrigé (`tp/Corrige_InsideTheFeed.md`) |
 
 **Par où commencer ?** `docs/demo.md` → `docs/mecanismes.md` → `docs/guide_code.md`.
 
