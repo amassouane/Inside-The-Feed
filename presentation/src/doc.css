@@ -1,0 +1,84 @@
+/* Feuille de style commune aux documents PDF (TP, guide de présentation).
+   Même charte que les diapos : fond clair, accent indigo, vert pour la recommandation. */
+@page { size: A4; margin: 15mm 15mm 16mm 15mm; }
+:root { --ink:#1b2033; --mute:#5d6478; --line:#dfe2ea; --soft:#f5f6fa; --ind:#4f46e5; --indsoft:#eef0ff;
+        --ok:#0e7c66; --oksoft:#e5f5f0; --m:#b4540a; --msoft:#fdf0e3; --warn:#a1281e; --warnsoft:#fdecea; --gold:#a16207; --goldsoft:#fffbea; }
+* { box-sizing: border-box; }
+body { font-family: -apple-system, "Avenir Next", "Helvetica Neue", Arial, sans-serif; color: var(--ink); font-size: 10pt; line-height: 1.45; margin: 0; background: #fff; }
+h1 { font-size: 26pt; margin: 0 0 5mm; letter-spacing: -.5px; } h1.big { font-size: 36pt; margin-top: 3mm; }
+h2 { font-size: 16pt; margin: 0 0 3.5mm; padding-bottom: 2mm; border-bottom: 2px solid var(--ind); break-after: avoid; }
+h3 { font-size: 11.5pt; margin: 4.5mm 0 2mm; color: var(--ind); break-after: avoid; }
+p { margin: 0 0 2.4mm; }
+ul, ol { margin: 0 0 2.8mm; padding-left: 5mm; } li { margin-bottom: .9mm; }
+code, pre, .path { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 8.5pt; }
+code, .path { background: var(--soft); border: 1px solid var(--line); border-radius: 3px; padding: 0 3px; }
+.path { white-space: nowrap; color: var(--ind); }
+pre { background: #1e2233; color: #e8eaf3; border-radius: 6px; padding: 2.8mm 4mm; margin: 0 0 3mm; line-height: 1.42; white-space: pre-wrap; break-inside: avoid; }
+pre code, pre .path { background: none; border: 0; padding: 0; color: inherit; }
+pre .c { color: #8f97b3; font-style: italic; } pre .k { color: #a5b4fc; } pre .h { background: #3a3f2a; color: #fde68a; display: inline-block; width: 100%; }
+pre .ln { color: #646c88; display: inline-block; width: 8mm; }
+table { width: 100%; border-collapse: collapse; margin: 0 0 3.5mm; font-size: 9.2pt; }
+th { background: var(--soft); text-align: left; font-weight: 600; }
+th, td { border: 1px solid var(--line); padding: 1.4mm 2.1mm; vertical-align: top; }
+tr { break-inside: avoid; }
+.page { break-before: page; }
+.mute { color: var(--mute); } .small { font-size: 8.9pt; }
+kbd { font-family: inherit; font-size: 8.4pt; border: 1px solid #c9cdd8; border-bottom-width: 2px; border-radius: 3px; padding: 0 3px; background: #fff; }
+
+/* Encadrés */
+.box, .learn, .manip, .qs { border-radius: 0 6px 6px 0; padding: 2.6mm 3.6mm; margin: 0 0 3.5mm; break-inside: avoid; }
+.box { border-left: 3px solid var(--ind); background: var(--indsoft); }
+.box.warn { border-color: var(--warn); background: var(--warnsoft); }
+.box.green { border-color: var(--ok); background: var(--oksoft); }
+.box.gold { border-color: var(--gold); background: var(--goldsoft); }
+.learn { border-left: 3px solid var(--ind); background: #f8f8ff; }
+.manip { border-left: 3px solid var(--ok); background: var(--oksoft); }
+.manip pre { margin: 1.5mm 0 1.5mm; }
+.qs { border-left: 3px solid var(--m); background: var(--msoft); }
+.qs ol { margin-bottom: 0; }
+.box b.t, .learn b.t, .manip b.t, .qs b.t { display: block; font-size: 8.2pt; letter-spacing: .7px; text-transform: uppercase; margin-bottom: 1.2mm; }
+.learn b.t { color: var(--ind); } .manip b.t { color: var(--ok); } .qs b.t { color: var(--m); }
+.learn p:last-child, .learn ol:last-child, .learn ul:last-child { margin-bottom: 0; }
+.formula { text-align: center; font-size: 10.5pt; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 2.4mm 3mm; margin: 0 0 3.5mm; break-inside: avoid; }
+.code-ref { font-size: 9pt; font-weight: 600; margin: 0 0 1.3mm; }
+.tree { background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 3mm 4mm; font-family: "SF Mono", Menlo, monospace; font-size: 8.3pt; line-height: 1.5; white-space: pre; break-inside: avoid; margin-bottom: 3.5mm; }
+.part { display: inline-block; font-size: 8.6pt; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #fff; background: var(--ind); border-radius: 10px; padding: .6mm 3mm; margin-bottom: 2.5mm; }
+.part.r { background: var(--ok); } .part.w { background: var(--m); }
+.tag { display: inline-block; font-weight: 700; font-size: 8.2pt; border-radius: 10px; padding: 0 2.3mm; white-space: nowrap; }
+.tag.A { background: var(--oksoft); color: var(--ok); } .tag.M { background: var(--msoft); color: var(--m); } .tag.AM { background: var(--indsoft); color: var(--ind); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+
+/* Couverture */
+.cover { height: 263mm; display: flex; flex-direction: column; justify-content: space-between; }
+.cover .kick { color: var(--ind); font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; font-size: 9.6pt; }
+.cover .sub { font-size: 13pt; color: var(--mute); max-width: 160mm; line-height: 1.45; }
+.toc { columns: 2; column-gap: 8mm; font-size: 9.8pt; } .toc li { break-inside: avoid; }
+.chain { display: flex; align-items: stretch; gap: 1.5mm; }
+.chain div { flex: 1; border: 1.5px solid var(--ind); background: var(--indsoft); border-radius: 7px; padding: 2.5mm 1.5mm; text-align: center; }
+.chain div.r { border-color: var(--ok); background: var(--oksoft); } .chain div.w { border-color: var(--m); background: var(--msoft); }
+.chain b { display: block; font-size: 10pt; } .chain span { font-size: 7.8pt; color: var(--mute); }
+.chain i { align-self: center; font-style: normal; color: var(--mute); }
+.who { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; } .who div { border: 1px solid var(--line); border-radius: 8px; padding: 3.5mm; }
+
+/* Fiches diapo (guide) */
+.slide { display: grid; grid-template-columns: 80mm 1fr; gap: 5mm; padding: 3.2mm 0; border-bottom: 1px solid var(--line); break-inside: avoid; }
+.slide img { width: 80mm; border: 1px solid var(--line); border-radius: 4px; display: block; }
+.slide .hd { display: flex; align-items: baseline; gap: 2mm; margin-bottom: 1.3mm; flex-wrap: wrap; }
+.slide .n { font-weight: 800; color: var(--ind); font-size: 12pt; } .slide .ti { font-weight: 700; font-size: 10.6pt; }
+.slide .dur { color: var(--mute); font-size: 8.4pt; margin-left: auto; }
+.slide .say { font-style: italic; margin-bottom: 1.3mm; font-size: 9.4pt; }
+.slide .k { font-size: 8.1pt; font-weight: 700; color: var(--mute); text-transform: uppercase; letter-spacing: .5px; }
+.handover { background: var(--msoft); border: 1px dashed var(--m); border-radius: 6px; padding: 2mm 3mm; margin: 3mm 0; font-size: 9.3pt; break-inside: avoid; }
+.handover.toA { background: var(--oksoft); border-color: var(--ok); }
+
+/* Fiches mécanisme (guide) */
+.mech { border: 1px solid var(--line); border-radius: 8px; padding: 3.2mm 4mm; margin: 0 0 4mm; break-inside: avoid; }
+.mech .mh { display: flex; align-items: center; gap: 2.5mm; margin-bottom: 2mm; }
+.mech .num { width: 7mm; height: 7mm; border-radius: 50%; background: var(--ind); color: #fff; font-weight: 700; display: grid; place-items: center; font-size: 10pt; flex: none; }
+.mech.r .num { background: var(--ok); } .mech.w .num { background: var(--m); }
+.mech .mt { font-size: 12pt; font-weight: 700; } .mech .ms { margin-left: auto; font-size: 8.4pt; color: var(--mute); }
+.mech .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 5mm; }
+.mech .lab { font-size: 7.8pt; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--mute); margin: 1mm 0 .5mm; }
+.mech .idea { background: var(--goldsoft); border-radius: 5px; padding: 1.8mm 2.6mm; margin-bottom: 2mm; }
+.mech ol, .mech ul { margin-bottom: 1mm; }
+.check li { list-style: none; margin-left: -5mm; } .check li::before { content: "☐  "; color: var(--ind); }

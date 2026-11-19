@@ -1,0 +1,325 @@
+{
+  "avertissement": "DONNÉES FICTIVES — publications inventées pour un démonstrateur pédagogique. Aucun compte, aucune personne et aucun événement réels.",
+  "posts": [
+    {
+      "id": "p01",
+      "auteur": "@tribune_nord",
+      "titre": "Derby sous la pluie : victoire 2-1 au bout du suspense",
+      "description": "Le match de ce soir a tenu tout le stade en haleine. L'équipe a égalisé en première mi-temps puis marqué le but de la victoire à la dernière minute. Les supporters ont chanté jusqu'au coup de sifflet final.",
+      "hashtags": ["#football", "#match", "#derby", "#supporters"],
+      "categorie": "football"
+    },
+    {
+      "id": "p02",
+      "auteur": "@tableau_noir",
+      "titre": "Analyse tactique : pourquoi le pressing haut fonctionne",
+      "description": "On décortique la stratégie de l'entraîneur : pressing haut, bloc compact et transitions rapides. Le milieu de terrain récupère le ballon plus vite et l'équipe se crée davantage d'occasions de but.",
+      "hashtags": ["#football", "#tactique", "#stratégie", "#entraîneur"],
+      "categorie": "football"
+    },
+    {
+      "id": "p03",
+      "auteur": "@scout_junior",
+      "titre": "Le jeune attaquant qui fait vibrer le championnat",
+      "description": "À 19 ans, il a déjà marqué dix buts cette saison. Rapide et précis devant le but, ce joueur est devenu le chouchou des supporters. Les recruteurs des grands clubs suivent chaque match.",
+      "hashtags": ["#football", "#championnat", "#attaquant", "#joueur"],
+      "categorie": "football"
+    },
+    {
+      "id": "p04",
+      "auteur": "@virage_sud",
+      "titre": "Coupe d'Afrique : l'ambiance incroyable des tribunes",
+      "description": "Drapeaux, chants et tambours : les supporters ont transformé le stade en fête géante. Retour en images sur un match de Coupe d'Afrique où l'équipe nationale a arraché sa qualification.",
+      "hashtags": ["#football", "#coupedafrique", "#supporters", "#stade"],
+      "categorie": "football"
+    },
+    {
+      "id": "p05",
+      "auteur": "@gants_dor",
+      "titre": "Entraînement du gardien : réflexes et plongeons",
+      "description": "Une séance d'entraînement spécifique pour gardien de but : réflexes, plongeons, appuis et explosivité. Ces exercices de gainage et de cardio servent aussi à tous les sportifs.",
+      "hashtags": ["#football", "#entraînement", "#gardien", "#cardio"],
+      "categorie": "football"
+    },
+    {
+      "id": "p06",
+      "auteur": "@le_debat_du_lundi",
+      "titre": "Ballon d'or : le débat qui divise les fans",
+      "description": "Faut-il récompenser les buts, les titres ou la régularité ? Chaque année, le Ballon d'or relance le débat entre supporters. Voici les trois joueurs favoris de la saison.",
+      "hashtags": ["#football", "#ballondor", "#débat"],
+      "categorie": "football"
+    },
+    {
+      "id": "p07",
+      "auteur": "@city_five",
+      "titre": "Foot entre amis : notre tournoi du dimanche",
+      "description": "Chaque dimanche, on organise un petit tournoi de foot sur le terrain du quartier. Cinq contre cinq, parties de dix minutes et beaucoup de bonne humeur.",
+      "hashtags": ["#foot", "#tournoi", "#quartier"],
+      "categorie": "football"
+    },
+    {
+      "id": "p08",
+      "auteur": "@manette_libre",
+      "titre": "Mode carrière : je mène un petit club jusqu'au titre",
+      "description": "Dans ce jeu vidéo de football, j'ai repris un club de deuxième division. Recrutement de joueurs, stratégie de match et gestion de l'équipe : après trois saisons virtuelles, le titre est enfin là. Partie jouée sur console.",
+      "hashtags": ["#gaming", "#football", "#console", "#jeuvidéo"],
+      "categorie": "gaming"
+    },
+    {
+      "id": "p09",
+      "auteur": "@sac_a_dos_ines",
+      "titre": "Week-end à Barcelone : stade, tapas et plage",
+      "description": "Trois jours à Barcelone pour assister à un match au stade, flâner dans les ruelles et goûter les tapas. Un voyage parfait pour les fans de football qui aiment aussi la plage.",
+      "hashtags": ["#voyage", "#barcelone", "#football", "#citytrip"],
+      "categorie": "voyage"
+    },
+    {
+      "id": "p10",
+      "auteur": "@routes_du_sud",
+      "titre": "Road trip dans le Sud marocain",
+      "description": "De Marrakech à Merzouga, dix jours de route entre les montagnes de l'Atlas, les kasbahs et les dunes du désert. Une nuit sous les étoiles dans un bivouac : un voyage inoubliable.",
+      "hashtags": ["#voyage", "#maroc", "#roadtrip", "#désert"],
+      "categorie": "voyage"
+    },
+    {
+      "id": "p11",
+      "auteur": "@valise_cabine",
+      "titre": "Voyager léger : ma valise pour deux semaines",
+      "description": "Comment voyager avec un seul bagage cabine ? Vêtements polyvalents, trousse minimaliste et liste à cocher. Moins de valise, plus de liberté pendant le voyage.",
+      "hashtags": ["#voyage", "#valise", "#astuces"],
+      "categorie": "voyage"
+    },
+    {
+      "id": "p12",
+      "auteur": "@carnet_nomade",
+      "titre": "Kyoto au printemps : temples et cerisiers",
+      "description": "Les cerisiers en fleurs, les temples silencieux et les ruelles de Gion. Nos conseils pour visiter Kyoto tôt le matin et éviter la foule des touristes.",
+      "hashtags": ["#voyage", "#japon", "#kyoto", "#photo"],
+      "categorie": "voyage"
+    },
+    {
+      "id": "p13",
+      "auteur": "@cimes_et_glaces",
+      "titre": "Trek en Islande : glaciers et cascades",
+      "description": "Une semaine de randonnée entre glaciers, cascades et volcans. Prévoir de bonnes chaussures, un sac léger et une bonne condition physique pour marcher six heures par jour.",
+      "hashtags": ["#voyage", "#trek", "#randonnée", "#islande"],
+      "categorie": "voyage"
+    },
+    {
+      "id": "p14",
+      "auteur": "@petit_budget",
+      "titre": "Voyage pas cher : bien réserver ses billets d'avion",
+      "description": "Comparer les dates, activer les alertes de prix et partir hors saison : nos astuces pour trouver des billets d'avion moins chers et partir en voyage plus souvent.",
+      "hashtags": ["#voyage", "#avion", "#budget", "#astuces"],
+      "categorie": "voyage"
+    },
+    {
+      "id": "p15",
+      "auteur": "@saveurs_de_la_place",
+      "titre": "Balade gourmande sur la place Jemaa el-Fna",
+      "description": "Le soir, la grande place de Marrakech se transforme en immense marché de cuisine de rue : brochettes, escargots aux épices et jus d'orange frais. Un voyage pour les papilles.",
+      "hashtags": ["#voyage", "#marrakech", "#streetfood", "#cuisine"],
+      "categorie": "voyage"
+    },
+    {
+      "id": "p16",
+      "auteur": "@objectif_poche",
+      "titre": "Photographier ses voyages avec un smartphone",
+      "description": "Pas besoin d'un gros appareil : avec un smartphone récent, le mode nuit et quelques réglages, on rapporte de superbes photos de voyage. Astuces de cadrage et applications de retouche.",
+      "hashtags": ["#voyage", "#photo", "#smartphone", "#astuces"],
+      "categorie": "voyage"
+    },
+    {
+      "id": "p17",
+      "auteur": "@cuisine_de_mima",
+      "titre": "Tajine de poulet aux citrons confits",
+      "description": "La recette familiale : poulet mariné aux épices, citrons confits et olives, cuit doucement pendant une heure. À servir avec du pain maison.",
+      "hashtags": ["#cuisine", "#recette", "#tajine", "#maroc"],
+      "categorie": "cuisine"
+    },
+    {
+      "id": "p18",
+      "auteur": "@chef_express",
+      "titre": "Pâtes crémeuses en 15 minutes",
+      "description": "Une recette rapide pour les soirs de semaine : pâtes, parmesan, citron et poivre. Peu d'ingrédients, beaucoup de saveur.",
+      "hashtags": ["#cuisine", "#recette", "#rapide", "#pâtes"],
+      "categorie": "cuisine"
+    },
+    {
+      "id": "p19",
+      "auteur": "@bowl_et_basta",
+      "titre": "Bowl protéiné après la séance de sport",
+      "description": "Quinoa, poulet grillé, avocat et pois chiches : un bowl riche en protéines pour récupérer après l'entraînement. Une recette simple à préparer à l'avance.",
+      "hashtags": ["#cuisine", "#protéines", "#recette", "#fitness"],
+      "categorie": "cuisine"
+    },
+    {
+      "id": "p20",
+      "auteur": "@douceurs_dorient",
+      "titre": "Pâtisserie : réussir ses cornes de gazelle",
+      "description": "Pâte d'amande parfumée à la fleur d'oranger, pâte fine et cuisson courte. Toutes les étapes de la recette, pas à pas.",
+      "hashtags": ["#cuisine", "#pâtisserie", "#recette"],
+      "categorie": "cuisine"
+    },
+    {
+      "id": "p21",
+      "auteur": "@mie_et_croute",
+      "titre": "Le pain maison sans machine",
+      "description": "Farine, eau, sel et levain : un pain croustillant cuit dans une cocotte. Le secret est dans la patience et le temps de pousse.",
+      "hashtags": ["#cuisine", "#pain", "#faitmaison"],
+      "categorie": "cuisine"
+    },
+    {
+      "id": "p22",
+      "auteur": "@labo_maison",
+      "titre": "J'ai testé un robot cuiseur connecté",
+      "description": "Ce robot de cuisine connecté pèse, mixe et cuit en suivant les recettes affichées sur son écran. Pratique, mais l'application demande un compte et une connexion Wi-Fi.",
+      "hashtags": ["#technologie", "#cuisine", "#objetconnecté", "#test"],
+      "categorie": "technologie"
+    },
+    {
+      "id": "p23",
+      "auteur": "@faim_de_marche",
+      "titre": "Street food : le meilleur burger du marché",
+      "description": "Au marché du samedi, un petit camion prépare des burgers au pain brioché et des frites maison. La file d'attente vaut le détour.",
+      "hashtags": ["#cuisine", "#streetfood", "#burger", "#marché"],
+      "categorie": "cuisine"
+    },
+    {
+      "id": "p24",
+      "auteur": "@chrono_pixel",
+      "titre": "Speedrun : finir le jeu en moins d'une heure",
+      "description": "Les speedrunners connaissent chaque raccourci du niveau. Retour sur un record du monde battu en direct pendant un stream, devant des milliers de spectateurs.",
+      "hashtags": ["#gaming", "#speedrun", "#record", "#stream"],
+      "categorie": "gaming"
+    },
+    {
+      "id": "p25",
+      "auteur": "@arena_live",
+      "titre": "Tournoi e-sport : la finale de dimanche",
+      "description": "Deux équipes de cinq joueurs, une finale en trois manches. La stratégie et la communication ont fait la différence devant un public déchaîné.",
+      "hashtags": ["#gaming", "#esport", "#tournoi", "#équipe"],
+      "categorie": "gaming"
+    },
+    {
+      "id": "p26",
+      "auteur": "@cartouche_88",
+      "titre": "Rétro gaming : la console de mon enfance",
+      "description": "J'ai ressorti ma vieille console et ses cartouches. Les graphismes ont vieilli, mais le plaisir de jeu reste intact.",
+      "hashtags": ["#gaming", "#rétro", "#console", "#nostalgie"],
+      "categorie": "gaming"
+    },
+    {
+      "id": "p27",
+      "auteur": "@tour_de_verre",
+      "titre": "Monter son PC gamer : le guide",
+      "description": "Carte graphique, processeur, mémoire et refroidissement : comment choisir ses composants pour jouer en haute résolution sans exploser son budget.",
+      "hashtags": ["#gaming", "#pc", "#matériel", "#technologie"],
+      "categorie": "gaming"
+    },
+    {
+      "id": "p28",
+      "auteur": "@petits_studios",
+      "titre": "Jeu indépendant coup de cœur : une aventure poétique",
+      "description": "Un petit studio a créé une aventure dessinée à la main, avec une musique magnifique. Le jeu se termine en cinq heures et laisse un souvenir durable.",
+      "hashtags": ["#gaming", "#indé", "#aventure"],
+      "categorie": "gaming"
+    },
+    {
+      "id": "p29",
+      "auteur": "@sueur_et_pixels",
+      "titre": "Jeux de danse : faire du sport devant l'écran",
+      "description": "Les jeux de danse et de réalité virtuelle font transpirer : trente minutes de partie équivalent à une vraie séance de cardio.",
+      "hashtags": ["#fitness", "#gaming", "#cardio", "#réalitévirtuelle"],
+      "categorie": "fitness"
+    },
+    {
+      "id": "p30",
+      "auteur": "@octet_curieux",
+      "titre": "Intelligence artificielle : comment marchent les recommandations ?",
+      "description": "Les applications analysent les textes et les interactions pour proposer des contenus similaires. Derrière, des algorithmes calculent des scores de similarité entre vecteurs.",
+      "hashtags": ["#technologie", "#ia", "#algorithme"],
+      "categorie": "technologie"
+    },
+    {
+      "id": "p31",
+      "auteur": "@batterie_pleine",
+      "titre": "Smartphone : cinq réglages pour économiser la batterie",
+      "description": "Luminosité automatique, mode sombre, notifications limitées : ces réglages simples prolongent l'autonomie de votre smartphone d'une bonne heure.",
+      "hashtags": ["#technologie", "#smartphone", "#batterie", "#astuces"],
+      "categorie": "technologie"
+    },
+    {
+      "id": "p32",
+      "auteur": "@poignet_malin",
+      "titre": "Montre connectée : gadget ou vrai coach ?",
+      "description": "Cardio, sommeil, nombre de pas : la montre connectée mesure tout. Mais ces données sont-elles fiables pour suivre son entraînement ?",
+      "hashtags": ["#technologie", "#montreconnectée", "#fitness", "#données"],
+      "categorie": "technologie"
+    },
+    {
+      "id": "p33",
+      "auteur": "@cadenas_numerique",
+      "titre": "Cybersécurité : choisir un bon mot de passe",
+      "description": "Une phrase longue, un gestionnaire de mots de passe et la double authentification protègent mieux vos comptes que des symboles compliqués.",
+      "hashtags": ["#technologie", "#cybersécurité", "#sécurité"],
+      "categorie": "technologie"
+    },
+    {
+      "id": "p34",
+      "auteur": "@premiere_ligne",
+      "titre": "Programmer son premier site web",
+      "description": "HTML pour la structure, CSS pour le style, JavaScript pour l'interactivité : les bases pour publier une page en un week-end.",
+      "hashtags": ["#technologie", "#code", "#web", "#débutant"],
+      "categorie": "technologie"
+    },
+    {
+      "id": "p35",
+      "auteur": "@oeil_du_var",
+      "titre": "VAR et capteurs : la technologie entre sur le terrain",
+      "description": "Assistance vidéo à l'arbitrage, ballon équipé d'un capteur et caméras autour du stade : la technologie aide l'arbitre à trancher, mais le débat continue chez les supporters.",
+      "hashtags": ["#technologie", "#var", "#arbitrage", "#football"],
+      "categorie": "technologie"
+    },
+    {
+      "id": "p36",
+      "auteur": "@reprise_douce",
+      "titre": "Programme débutant : trois séances par semaine",
+      "description": "Squats, pompes, gainage et marche rapide : un programme d'entraînement simple pour reprendre le sport en douceur, sans matériel.",
+      "hashtags": ["#fitness", "#entraînement", "#débutant", "#sport"],
+      "categorie": "fitness"
+    },
+    {
+      "id": "p37",
+      "auteur": "@foulee_legere",
+      "titre": "Courir son premier 10 km",
+      "description": "Huit semaines d'entraînement progressif en alternant course lente, fractionné et récupération. L'objectif : franchir la ligne d'arrivée avec le sourire.",
+      "hashtags": ["#fitness", "#course", "#running", "#cardio"],
+      "categorie": "fitness"
+    },
+    {
+      "id": "p38",
+      "auteur": "@barre_et_dos",
+      "titre": "Musculation : la technique avant la charge",
+      "description": "Bien placer son dos, contrôler la descente et respirer : une bonne technique évite les blessures et fait progresser plus vite que soulever lourd.",
+      "hashtags": ["#fitness", "#musculation", "#technique"],
+      "categorie": "fitness"
+    },
+    {
+      "id": "p39",
+      "auteur": "@tapis_du_matin",
+      "titre": "Yoga du matin : dix minutes pour se réveiller",
+      "description": "Une courte séance d'étirements et de respiration pour bien commencer la journée et réduire le stress.",
+      "hashtags": ["#fitness", "#yoga", "#bienêtre"],
+      "categorie": "fitness"
+    },
+    {
+      "id": "p40",
+      "auteur": "@assiette_athlete",
+      "titre": "Nutrition sportive : combien de protéines ?",
+      "description": "Pour progresser à l'entraînement, l'apport en protéines compte autant que la séance. Œufs, légumineuses, poisson : des idées de repas et de recettes simples.",
+      "hashtags": ["#fitness", "#nutrition", "#protéines", "#recette"],
+      "categorie": "fitness"
+    }
+  ]
+}

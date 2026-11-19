@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Résumé — Inside the Feed</title><link rel="stylesheet" href="doc.css">
+<style>body{font-size:9.6pt} h2{font-size:13pt;margin-top:3mm} .learn{margin-bottom:2.5mm} td,th{padding:1.1mm 1.8mm}</style></head>
+<body>
+<h1 style="font-size:20pt;margin-bottom:1mm">Inside the Feed — le projet en 2 pages</h1>
+<p class="mute">Lancer : <code>cd ~/Desktop/NLP_RECOMM &amp;&amp; source .venv/bin/activate &amp;&amp; streamlit run app.py</code> → <span class="path">http://localhost:8501</span>.
+Feed à gauche, étapes du moteur à droite après chaque ♡.</p>
+
+<div class="box"><b class="t">L'idée en une phrase</b>
+On recommande des posts qui <b>ressemblent</b> (par leurs mots) à ceux que l'utilisateur a aimés : le texte devient un vecteur (TF-IDF),
+l'utilisateur devient la moyenne de ses likes, et on trie les posts par cosinus. C'est la recommandation <b>basée sur le contenu</b>.</div>
+
+<h2>Quand je clique ♡ sur un post, voici ce qui se passe</h2>
+<table>
+  <tr><th style="width:4%">#</th><th style="width:17%">Étape</th><th>Ce qui se passe</th><th style="width:28%">Où dans le code</th></tr>
+  <tr><td>0</td><td><b>Avant tout like</b></td><td>Pas de profil, donc pas de score (<i>cold start</i>) : un post par thème, à tour de rôle.</td><td><span class="path">feed.py</span> <code>initial_feed()</code></td></tr>
+  <tr><td>1</td><td><b>Texte</b></td><td>On prend titre + description + hashtags du post. La catégorie n'est jamais lue.</td><td><span class="path">preprocessing.py</span> <code>build_document()</code></td></tr>
+  <tr><td>2</td><td><b>Tokens</b></td><td>Minuscules → découpage en mots → suppression des mots vides (le, de, au…). p01 : 50 → 29 mots.</td><td><span class="path">preprocessing.py</span> <code>preprocess()</code></td></tr>
+  <tr><td>3</td><td><b>TF-IDF</b></td><td>Chaque mot reçoit un poids : <b>fréquent dans le post × rare dans les 40 posts</b>, puis le vecteur est ramené à une longueur 1. Un post = 564 nombres.</td><td><span class="path">model.py</span> <code>make_vectorizer()</code></td></tr>
+  <tr><td>4</td><td><b>Profil</b></td><td>Moyenne des vecteurs des posts aimés, ramenée à une longueur 1 : l'utilisateur devient un vecteur, comme un post.</td><td><span class="path">model.py</span> <code>build_profile()</code></td></tr>
+  <tr><td>5</td><td><b>Score</b></td><td>Cosinus profil ↔ chaque post non aimé = <b>somme de (poids profil × poids post)</b> sur les mots communs. On voit donc quels mots expliquent le score.</td><td><span class="path">model.py</span> <code>similarity_scores()</code>, <code>term_contributions()</code></td></tr>
+  <tr><td>6</td><td><b>Feed</b></td><td>Tri par score décroissant, 8 premiers affichés. Option <b>exploration 25 %</b> : 2 places pour des thèmes absents, scores inchangés.</td><td><span class="path">feed.py</span> <code>rank_by_similarity()</code>, <code>build_feed()</code></td></tr>
+</table>
+
+<h2>Les 3 formules à connaître</h2>
+<div class="formula" style="text-align:left">
+<b>idf(t)</b> = ln((1 + n) / (1 + df(t))) + 1 &nbsp;<span class="mute small">n = 40 posts, df = nombre de posts contenant t</span><br>
+<b>profil</b> = moyenne(vecteurs aimés) / sa longueur<br>
+<b>score</b> = cos(profil, post) = Σ profil[t] × post[t] &nbsp;<span class="mute small">(car les vecteurs ont une longueur 1)</span></div>
+
+<h2>Exemple à savoir refaire</h2>
+<p>T1 « Le match de football au stade », T2 « Voyage au stade de Barcelone », T3 « Recette du tajine marocain » (n = 3).
+<code>stade</code> est dans 2 textes → idf = ln(4/3) + 1 = <b>1,288</b> ; les autres dans 1 → ln(4/2) + 1 = <b>1,693</b>.
+T1 = (1,693 ; 1,693 ; 1,288) ÷ 2,719 = football 0,623 · match 0,623 · stade 0,474.
+<b>cos(T1, T2) = 0,474 × 0,474 = 0,224</b> (seul <code>stade</code> est commun) ; cos(T1, T3) = 0.</p>
+
+<h2>Ce qu'on voit dans la démo (3 likes football p01, p02, p03, puis p10)</h2>
+<ul>
+  <li><b>p04 n°1 (0,148)</b> = supporters 0,059 + match 0,029 + stade 0,022 + football 0,020 + équipe 0,019.</li>
+  <li><b>Pâtes (p18) 8ᵉ</b> à cause du seul mot « rapide » (attaquant rapide / recette rapide) : <b>polysémie</b>.</li>
+  <li><b>+ like p10 (voyage)</b> : p09 Barcelone passe de la 5ᵉ à la 2ᵉ place (il a les deux vocabulaires) ; p15 et p14 entrent.</li>
+  <li><b>Exploration 25 %</b> : p18 (cuisine) et p36 (fitness) en positions 4 et 8, sans changer leur score.</li>
+</ul>
+
+<h2>Les limites (à dire honnêtement)</h2>
+<table class="small">
+  <tr><th style="width:22%">Limite</th><th>Exemple</th></tr>
+  <tr><td>Synonymes</td><td>« football » ≠ « foot » : cos(p01, p07) = 0</td></tr>
+  <tr><td>Polysémie</td><td>« rapide » met des pâtes dans un feed football</td></tr>
+  <tr><td>Mots ≠ thème</td><td>foot entre amis / tournoi e-sport (0,271) &gt; deux posts football (0,177)</td></tr>
+  <tr><td>Pas de lemmatisation</td><td>joueur ≠ joueurs</td></tr>
+  <tr><td>Surspécialisation</td><td>le feed suit le passé → d'où l'exploration</td></tr>
+</table>
+<p class="small">La démo ne prouve rien sur TikTok/Instagram ni sur les bulles de filtre : 1 utilisateur fictif, 40 posts fictifs.</p>
+
+<h2>Les fichiers</h2>
+<table class="small">
+  <tr><td style="width:32%"><span class="path">data/posts.json</span></td><td>40 posts fictifs, 6 thèmes</td></tr>
+  <tr><td><span class="path">recommender/preprocessing.py</span></td><td>texte → tokens (étapes 1–2)</td></tr>
+  <tr><td><span class="path">recommender/model.py</span></td><td>TF-IDF, profil, cosinus, explication (étapes 3–5)</td></tr>
+  <tr><td><span class="path">recommender/feed.py</span></td><td>cold start, classement, exploration (étapes 0 et 6)</td></tr>
+  <tr><td><span class="path">app.py</span></td><td>l'interface simple (feed + étapes) · <span class="path">app_complet.py</span> : l'ancienne interface complète</td></tr>
+  <tr><td><span class="path">tests/</span></td><td>46 tests : <code>python -m pytest -q</code></td></tr>
+</table>
+
+<div class="box green"><b class="t">Questions fréquentes</b>
+<b>Pourquoi TF-IDF ?</b> Entièrement explicable, mot par mot. &nbsp;<b>Pourquoi le cosinus ?</b> Compare des directions, pas la longueur des textes.
+&nbsp;<b>0,148 c'est faible ?</b> Seul l'ordre compte : c'est une similarité, pas une probabilité.
+&nbsp;<b>Collaboratif ?</b> Utilise les likes des autres utilisateurs, pas le texte ; non implémenté ici.</div>
+</body>
+</html>

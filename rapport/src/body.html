@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Inside the Feed — corps du rapport</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="body">
+
+<!-- =================================================================== -->
+<section class="chapter unnumbered" id="intro">
+<h1>Introduction</h1>
+
+<p>Chaque jour, les réseaux sociaux, les plateformes vidéo et les sites d'information choisissent pour nous
+quelques dizaines de publications parmi des milliers. Cette sélection, que l'on appelle le <em>feed</em>,
+n'est pas le fruit du hasard : elle est produite par un <strong>système de recommandation</strong>, c'est-à-dire
+un programme qui estime quels contenus sont susceptibles d'intéresser un utilisateur donné.</p>
+
+<p>Ces systèmes reposent en grande partie sur le <strong>traitement automatique du langage naturel</strong>
+(<abbr>NLP</abbr>). Pour comparer des publications entre elles, ou une publication avec les goûts d'un utilisateur,
+il faut d'abord transformer du texte en une représentation numérique sur laquelle une machine peut calculer.</p>
+
+<p>Ce projet, intitulé <strong>« Inside the Feed »</strong>, a pour but d'ouvrir le capot d'un tel moteur.
+Nous avons construit un mini réseau social simulé, composé de 40 publications fictives réparties en six thèmes,
+et un moteur de recommandation <strong>basé sur le contenu</strong> : les textes sont vectorisés par
+<strong>TF-IDF</strong>, l'utilisateur est représenté par un <strong>profil</strong> construit à partir de ses
+likes, et les publications sont classées par <strong>similarité cosinus</strong>.</p>
+
+<p>L'accent est mis sur l'<strong>explicabilité</strong> : chaque score affiché peut être décomposé terme par terme,
+et l'interface Streamlit montre, étape par étape, comment un texte devient un vecteur puis un rang dans le feed.
+La problématique qui guide ce travail est la suivante :</p>
+
+<div class="box"><p class="noindent"><em>Comment un système peut-il transformer des textes et des interactions
+en un feed personnalisé, et dans quelle mesure ce calcul peut-il être rendu explicable ?</em></p></div>
+
+<p>Ce rapport présente successivement les objectifs et l'environnement technique, les notions théoriques
+mobilisées, la conception du moteur, l'interface réalisée, les expériences menées, puis une analyse critique
+des limites du modèle.</p>
+</section>
+
+<!-- =================================================================== -->
+<section class="chapter">
+<h1>Objectifs et environnement technique</h1>
+
+<h2>Objectifs du projet</h2>
+<p class="noindent">Les principaux objectifs sont les suivants :</p>
+<ul class="dash">
+  <li>Comprendre le fonctionnement d'un système de recommandation basé sur le contenu.</li>
+  <li>Mettre en œuvre une chaîne de prétraitement de texte en français (tokenisation, mots vides).</li>
+  <li>Représenter les publications par des vecteurs TF-IDF et les comparer par similarité cosinus.</li>
+  <li>Construire un profil utilisateur à partir de likes et en déduire un feed classé.</li>
+  <li>Rendre chaque recommandation <strong>explicable</strong>, terme par terme.</li>
+  <li>Développer une interface interactive permettant de démontrer le mécanisme en direct.</li>
+  <li>Observer les effets et les limites du modèle à travers des expériences reproductibles.</li>
+</ul>
+
+<h2>Environnement matériel et logiciel</h2>
+<p class="noindent">Le travail a été réalisé dans l'environnement suivant :</p>
+<div class="tablewrap">
+<table class="bt" data-caption="Environnement technique utilisé" style="width:85%">
+<thead><tr><th>Élément</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><strong>Système d'exploitation</strong></td><td>macOS</td></tr>
+<tr><td><strong>Langage</strong></td><td>Python 3.13.2</td></tr>
+<tr><td><strong>Environnement</strong></td><td>Environnement virtuel Python (<code>.venv</code>)</td></tr>
+<tr><td><strong>Vectorisation et similarité</strong></td><td>scikit-learn 1.9.1 (<code>TfidfVectorizer</code>, <code>cosine_similarity</code>)</td></tr>
+<tr><td><strong>Calcul numérique</strong></td><td>NumPy, pandas</td></tr>
+<tr><td><strong>Interface</strong></td><td>Streamlit 1.66.1</td></tr>
+<tr><td><strong>Tests</strong></td><td>pytest (44 tests automatiques)</td></tr>
+<tr><td><strong>Données</strong></td><td>40 publications fictives (<code>data/posts.json</code>), 6 thèmes</td></tr>
+<tr><td><strong>Adresse locale</strong></td><td><code>http://localhost:8501</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<p>L'application fonctionne entièrement <strong>hors ligne</strong> : aucune API externe, aucun compte et aucune
+base de données ne sont utilisés. Le serveur Streamlit n'écoute que sur l'adresse locale et la télémétrie est désactivée.</p>
+
+<h2>Installation des dépendances</h2>
+<p>Un environnement virtuel Python a été utilisé afin d'isoler les dépendances du projet.
+Les commandes suivantes permettent de le créer, de l'activer et d'installer les bibliothèques nécessaires :</p>
+<div class="listing" data-caption="Création de l'environnement et installation">
+<pre data-lang="sh">python3.13 -m venv .venv
+source .venv/bin/activate
+
+python -m pip install -r requirements.txt pytest
+python -m pytest -q</pre></div>
+<p>La dernière commande exécute la suite de tests et permet de vérifier que l'installation est complète
+et que les calculs donnent les résultats attendus.</p>
+</section>
+
+<!-- =================================================================== -->
+<section class="chapter">
+<h1>Étude théorique</h1>
+
+<h2>Systèmes de recommandation</h2>
+<p>Un système de recommandation résout un problème de <strong>classement</strong> : parmi un grand nombre de contenus,
+il doit décider lesquels montrer en premier. On distingue habituellement trois familles :</p>
+<ul class="dash">
+  <li><strong>Recommandation basée sur le contenu :</strong> on recommande des contenus qui <em>ressemblent</em>
+      à ceux que l'utilisateur a aimés. La ressemblance est calculée à partir des caractéristiques des contenus,
+      ici leur texte.</li>
+  <li><strong>Filtrage collaboratif :</strong> on recommande des contenus aimés par des utilisateurs aux goûts
+      proches (« ceux qui ont aimé X ont aussi aimé Y »). Le texte n'est pas utilisé.</li>
+  <li><strong>Approche hybride :</strong> combinaison des deux, enrichie de signaux comme la popularité ou le contexte.
+      C'est le cas des grandes plateformes.</li>
+</ul>
+<p>Ce projet se concentre sur la première famille : elle ne nécessite qu'un seul utilisateur et peut être
+expliquée entièrement, ce qui la rend adaptée à un démonstrateur pédagogique.</p>
+
+<h2>Prétraitement du texte</h2>
+<p>Avant toute représentation numérique, le texte brut est normalisé. Trois opérations sont appliquées :</p>
+<ul class="dash">
+  <li><strong>mise en minuscules</strong>, pour que « Match » et « match » soient le même mot ;</li>
+  <li><strong>tokenisation</strong> : découpage du texte en unités (<em>tokens</em>), ici des suites de lettres ;</li>
+  <li><strong>suppression des mots vides</strong> (<em>stopwords</em>) : mots très fréquents et peu informatifs
+      comme « le », « de » ou « pour ».</li>
+</ul>
+<p>Aucune lemmatisation n'est effectuée : « joueur » et « joueurs » restent deux termes distincts.
+Ce choix volontaire simplifie l'explication et sera discuté dans les limites.</p>
+
+<h2>Pondération TF-IDF</h2>
+<p>TF-IDF (<em>Term Frequency – Inverse Document Frequency</em>) attribue à chaque terme d'un document un poids
+d'autant plus élevé que le terme est <strong>fréquent dans le document</strong> et <strong>rare dans le corpus</strong>.
+Avec <i>n</i> le nombre de documents et <i>df(t)</i> le nombre de documents contenant le terme <i>t</i>, les formules
+réellement utilisées sont :</p>
+<div class="formula">tf(<i>t</i>, <i>d</i>) = nombre d'occurrences de <i>t</i> dans <i>d</i><span class="eqno">(2.1)</span></div>
+<div class="formula">idf(<i>t</i>) = ln( (1 + <i>n</i>) / (1 + df(<i>t</i>)) ) + 1<span class="eqno">(2.2)</span></div>
+<div class="formula"><i>w</i>(<i>t</i>, <i>d</i>) = tf(<i>t</i>, <i>d</i>) × idf(<i>t</i>), &nbsp;&nbsp; <b><i>x</i></b><sub><i>d</i></sub> = <b><i>w</i></b><sub><i>d</i></sub> / ‖<b><i>w</i></b><sub><i>d</i></sub>‖<sub>2</sub><span class="eqno">(2.3)</span></div>
+<p>La formule (2.2) correspond à l'idf lissé de scikit-learn (<code>smooth_idf=True</code>). La normalisation L2
+de l'équation (2.3) donne à chaque vecteur une longueur égale à 1, ce qui simplifie le calcul du cosinus.</p>
+
+<h2>Similarité cosinus</h2>
+<p>La similarité cosinus mesure l'angle entre deux vecteurs, indépendamment de leur longueur :</p>
+<div class="formula">cos(<b><i>u</i></b>, <b><i>v</i></b>) = (<b><i>u</i></b> · <b><i>v</i></b>) / (‖<b><i>u</i></b>‖ × ‖<b><i>v</i></b>‖) = Σ<sub><i>t</i></sub> <i>u</i>[<i>t</i>] × <i>v</i>[<i>t</i>] &nbsp;&nbsp; si ‖<b><i>u</i></b>‖ = ‖<b><i>v</i></b>‖ = 1<span class="eqno">(2.4)</span></div>
+<p>Comme tous les poids TF-IDF sont positifs, le score est compris entre 0 (aucun terme commun) et 1
+(même direction). Puisque les vecteurs sont normalisés, le cosinus devient une simple <strong>somme de produits terme
+par terme</strong> : c'est cette propriété qui rend chaque recommandation explicable.</p>
+
+<h2>Profil utilisateur</h2>
+<p>L'utilisateur est représenté dans le même espace vectoriel que les publications. Son profil est la moyenne
+des vecteurs des publications aimées <i>L</i>, renormalisée :</p>
+<div class="formula"><b><i>u</i></b> = <b><i>m</i></b> / ‖<b><i>m</i></b>‖<sub>2</sub> &nbsp;&nbsp; avec &nbsp; <b><i>m</i></b> = (1 / |<i>L</i>|) × Σ<sub><i>d</i> ∈ <i>L</i></sub> <b><i>x</i></b><sub><i>d</i></sub><span class="eqno">(2.5)</span></div>
+<p>Sans aucun like, le profil n'existe pas : c'est le problème du <strong>démarrage à froid</strong> (<em>cold start</em>).</p>
+
+<h2>Architecture du moteur</h2>
+<p>La chaîne complète, du texte au feed affiché, est représentée ci-dessous.</p>
+<figure data-caption="Chaîne de traitement du moteur de recommandation">
+<div class="pipeline">
+  <div class="st"><b>Texte</b>titre + description + hashtags</div><div class="ar">→</div>
+  <div class="st"><b>Tokens</b>minuscules, mots vides</div><div class="ar">→</div>
+  <div class="st"><b>TF-IDF</b>vecteur de 564 termes</div><div class="ar">→</div>
+  <div class="st"><b>Profil</b>moyenne des likes</div><div class="ar">→</div>
+  <div class="st"><b>Cosinus</b>score par post</div><div class="ar">→</div>
+  <div class="st"><b>Feed</b>classement + exploration</div>
+</div>
+</figure>
+<p>Les cinq premières étapes relèvent du NLP et du calcul vectoriel. La dernière, la construction du feed,
+est une <strong>règle de produit</strong> séparée : elle décide quoi afficher à partir des scores, sans les modifier.</p>
+</section>
+
+<!-- =================================================================== -->
+<section class="chapter">
+<h1>Conception et réalisation du moteur</h1>
+
+<h2>Organisation du code et données</h2>
+<p>Le projet sépare strictement les calculs de l'affichage. Le paquet <code>recommender/</code> contient tout le
+moteur et n'importe jamais Streamlit ; il peut donc être testé et réutilisé indépendamment de l'interface.</p>
+<div class="tablewrap">
+<table class="bt" data-caption="Organisation des fichiers du projet" style="width:92%">
+<thead><tr><th>Fichier</th><th>Rôle</th></tr></thead>
+<tbody>
+<tr><td><code>recommender/preprocessing.py</code></td><td>Texte → tokens (minuscules, expression régulière, mots vides)</td></tr>
+<tr><td><code>recommender/model.py</code></td><td>TF-IDF, profil, cosinus, contributions des termes</td></tr>
+<tr><td><code>recommender/feed.py</code></td><td>Feed initial, classement, règle d'exploration</td></tr>
+<tr><td><code>recommender/scenarios.py</code></td><td>Scénarios de démonstration et expériences A à D</td></tr>
+<tr><td><code>app.py</code>, <code>ui_style.py</code></td><td>Interface Streamlit (affichage uniquement)</td></tr>
+<tr><td><code>data/posts.json</code></td><td>40 publications fictives</td></tr>
+<tr><td><code>data/stopwords_fr.txt</code></td><td>Liste locale de mots vides</td></tr>
+<tr><td><code>tests/</code></td><td>Tests pytest (calculs, scénarios, interface)</td></tr>
+</tbody>
+</table>
+</div>
+<p>Chaque publication possède un identifiant (<code>p01</code> à <code>p40</code>), un auteur fictif, un titre, une
+description, des hashtags et une catégorie. Les 40 publications se répartissent ainsi : voyage (8), football (7),
+technologie (7), gaming (6), cuisine (6) et fitness (6). Toutes les données sont <strong>entièrement inventées</strong>.</p>
+<p><strong>Point important :</strong> la catégorie n'est jamais utilisée par le modèle NLP. Seul le texte (titre,
+description et hashtags) est vectorisé ; la catégorie sert uniquement à l'affichage, au feed initial et à la règle d'exploration.</p>
+
+<h2>Prétraitement</h2>
+<p>Le document analysé est la concaténation du titre, de la description et des hashtags. Il est ensuite découpé
+par une expression régulière qui ne conserve que les suites de lettres, accents compris. La ponctuation, les chiffres,
+les apostrophes et le symbole <code>#</code> servent de séparateurs : <code>l'équipe</code> devient <code>équipe</code>
+et <code>#football</code> devient <code>football</code>.</p>
+<div class="listing" data-caption="Prétraitement du texte (recommender/preprocessing.py)">
+<pre data-lang="py">TOKEN_PATTERN = re.compile(r"[a-zàâäçéèêëîïôöùûüÿœæ]+")
+MIN_TOKEN_LENGTH = 2
+
+def build_document(post: dict) -&gt; str:
+    """Concatène titre + description + hashtags : c'est le texte analysé."""
+    return " ".join([post["titre"], post["description"], " ".join(post["hashtags"])])
+
+def tokenize(text: str) -&gt; list[str]:
+    return [token for token in TOKEN_PATTERN.findall(text.lower())
+            if len(token) &gt;= MIN_TOKEN_LENGTH]
+
+def preprocess(text: str) -&gt; list[str]:
+    """Chaîne complète : texte brut → tokens utiles."""
+    return remove_stopwords(tokenize(text))</pre></div>
+<p>Pour la publication <code>p01</code> (« Derby sous la pluie »), on passe de <strong>50 tokens bruts à 29 tokens
+conservés</strong> : 21 mots vides sont retirés. La figure suivante montre ce résultat tel qu'il est affiché dans l'application.</p>
+<figure class="w90" data-caption="Tokens de la publication p01 : les mots vides apparaissent barrés">
+<img src="../figures/algo_tokens.jpg" alt="">
+</figure>
+<p>Les nombres écrits en lettres (« dix », « trois »…) ont été ajoutés aux mots vides. C'est un choix du projet :
+« dix buts » et « dix minutes de yoga » créaient une similarité sans rapport avec le sens.</p>
+
+<h2>Vectorisation TF-IDF</h2>
+<p>La vectorisation utilise <code>TfidfVectorizer</code> de scikit-learn. Tous les paramètres sont écrits explicitement
+afin de correspondre exactement aux formules du chapitre précédent. Notre fonction <code>preprocess</code> est passée
+comme <code>analyzer</code> : le même code sert donc à l'affichage des tokens et au calcul.</p>
+<div class="listing" data-caption="Configuration du vectoriseur (recommender/model.py)">
+<pre data-lang="py">def make_vectorizer() -&gt; TfidfVectorizer:
+    return TfidfVectorizer(
+        analyzer=preprocess,  # notre prétraitement remplace celui de sklearn
+        use_idf=True,
+        smooth_idf=True,
+        sublinear_tf=False,
+        norm="l2",
+    )</pre></div>
+<p>Ajusté sur les 40 publications, le vectoriseur produit un vocabulaire de <strong>564 termes</strong>.
+La matrice obtenue (40 × 564) ne contient que <strong>735 valeurs non nulles, soit 3,3 %</strong> : chaque
+publication n'utilise qu'une petite partie du vocabulaire. Quelques valeurs d'idf illustrent la formule (2.2) :
+<code>désert</code> 4,020 (présent dans un seul post), <code>supporters</code> 2,922, <code>voyage</code> 2,516,
+<code>football</code> 2,411. Plus un mot est répandu, plus son poids est faible.</p>
+<figure class="w90" data-caption="Poids TF-IDF de p01 et profil d'un utilisateur ayant aimé trois posts football">
+<img src="../figures/algo_tfidf_profil.jpg" alt="">
+</figure>
+
+<h2>Profil utilisateur et score</h2>
+<p>Le profil est calculé comme la moyenne des lignes aimées de la matrice, puis normalisé. Le score d'une
+publication est son cosinus avec le profil.</p>
+<div class="listing" data-caption="Profil, similarité et explication du score (recommender/model.py)">
+<pre data-lang="py">def build_profile(self, liked_ids: list[str]) -&gt; np.ndarray | None:
+    if not liked_ids:
+        return None                       # cold start : pas de profil
+    rows = [self.index[pid] for pid in liked_ids]
+    mean = np.asarray(self.matrix[rows].mean(axis=0)).ravel()
+    norm = np.linalg.norm(mean)
+    return mean / norm if norm &gt; 0 else None
+
+def similarity_scores(self, profile: np.ndarray) -&gt; np.ndarray:
+    return cosine_similarity(profile.reshape(1, -1), self.matrix).ravel()
+
+def term_contributions(self, profile: np.ndarray, post_id: str) -&gt; list[dict]:
+    post = self.post_vector(post_id)
+    products = profile * post             # contribution de chaque terme
+    shared = np.flatnonzero(products)     # termes communs au profil et au post
+    ...</pre></div>
+<p>La fonction <code>term_contributions</code> est au cœur de l'explicabilité : elle renvoie les termes communs au
+profil et à la publication, avec leur contribution <i>u</i>[<i>t</i>] × <i>x</i><sub><i>d</i></sub>[<i>t</i>].
+Leur somme est <strong>exactement</strong> égale au score, ce que vérifie un test automatique.</p>
+<figure class="w90" data-caption="Décomposition d'un score en contributions de termes">
+<img src="../figures/algo_contributions.jpg" alt="">
+</figure>
+
+<h2>Construction du feed</h2>
+<p>Le module <code>feed.py</code> décide quelles publications afficher et dans quel ordre. Le feed contient
+<strong>8 publications</strong>. Trois cas sont distingués :</p>
+<ul class="dash">
+  <li><strong>Aucun like (cold start) :</strong> un post par thème, à tour de rôle, dans un ordre fixe
+      (football, voyage, cuisine, gaming, technologie, fitness). Ce feed est déterministe, équilibré et
+      explicitement marqué comme <em>non personnalisé</em>.</li>
+  <li><strong>Avec des likes :</strong> les publications non aimées sont triées par score décroissant ;
+      à égalité, l'identifiant départage.</li>
+  <li><strong>Exploration :</strong> une proportion <i>p</i> du feed est réservée à des thèmes absents du top 8.</li>
+</ul>
+<p>La règle d'exploration fonctionne ainsi : on réserve <i>k</i> = arrondi(8 × <i>p</i>) places, on repère les thèmes
+qui n'apparaissent pas dans les 8 meilleurs scores, puis on prend à tour de rôle le meilleur post non aimé de chaque
+thème absent. Ces posts sont insérés à intervalles réguliers. <strong>Les scores ne sont jamais modifiés</strong> :
+l'exploration n'est pas du NLP, c'est une règle séparée et réglable destinée à limiter la surspécialisation.</p>
+<div class="listing" data-caption="Point d'entrée de la construction du feed (recommender/feed.py)">
+<pre data-lang="py">def build_feed(model, liked_ids, exploration=0.0, size=FEED_SIZE) -&gt; FeedResult:
+    if not liked_ids:
+        items = initial_feed(model, size)          # feed équilibré, sans score
+        ...
+    ranking = rank_by_similarity(model, liked_ids)
+    top = ranking[:size]                           # classement de pertinence initial
+    themes_absents = [c for c in CATEGORY_ORDER if c not in themes_top]
+
+    k = exploration_slots(size, exploration)       # arrondi(size × p)
+    explore = pick_exploration(model, ranking, themes_absents, k)
+    ...</pre></div>
+</section>
+
+<!-- =================================================================== -->
+<section class="chapter">
+<h1>Interface et démonstration</h1>
+
+<h2>Principe de l'interface</h2>
+<p>L'interface est développée avec <strong>Streamlit</strong>. Elle se contente d'appeler les fonctions du paquet
+<code>recommender/</code> et d'en afficher les résultats. Elle est organisée en quatre onglets :</p>
+<ul class="dash">
+  <li><strong>Feed :</strong> le fil d'actualité simulé, avec un bouton « Aimer » sur chaque carte, le score
+      de similarité et des indicateurs de mouvement (▲, ▼, nouveau) ;</li>
+  <li><strong>Ouvrir l'algorithme :</strong> les étapes du calcul pour une publication choisie, du texte brut
+      jusqu'au classement, avec un bouton « Voir le code » qui affiche la fonction réellement exécutée ;</li>
+  <li><strong>Expériences A–D :</strong> quatre expériences reproductibles décrites au chapitre suivant ;</li>
+  <li><strong>Comprendre &amp; limites :</strong> les notions clés et les limites observées.</li>
+</ul>
+<p>La barre latérale propose des scénarios prédéfinis, un curseur d'exploration (0 à 50 %), la liste des likes
+et un bouton de réinitialisation. Un <strong>mode présentation</strong> agrandit le texte et ajoute un parcours guidé en six étapes.</p>
+
+<h2>Lancement de l'application</h2>
+<div class="listing" data-caption="Lancement de l'application Streamlit">
+<pre data-lang="sh">source .venv/bin/activate
+streamlit run app.py</pre></div>
+<p>L'application est ensuite accessible à l'adresse <code>http://localhost:8501</code>. Le modèle TF-IDF est mis
+en cache (<code>st.cache_resource</code>) : il n'est calculé qu'une seule fois au démarrage.</p>
+
+<h2>Démarrage à froid</h2>
+<p>Au premier lancement, aucun like n'est enregistré. Le feed affiche alors un échantillon équilibré :
+p01, p09, p17, p08, p22, p29, p02, p10, soit un post par thème à tour de rôle. Aucun score n'est affiché.</p>
+<figure class="w90" data-caption="Feed initial (cold start) : un post par thème, non personnalisé">
+<img src="../figures/cold_start.jpg" alt="">
+</figure>
+
+<h2>Transparence du calcul</h2>
+<p>L'onglet « Ouvrir l'algorithme » suit une publication à travers toute la chaîne. Il affiche successivement le texte
+original, les tokens, les poids TF-IDF (avec un recalcul manuel comparé aux valeurs de scikit-learn, écart maximal
+de l'ordre de 10<sup>−17</sup>), le profil, la décomposition du score, le classement et un extrait de la matrice TF-IDF.</p>
+<figure class="w90" data-caption="Classement des posts non aimés par score décroissant">
+<img src="../figures/algo_classement.jpg" alt="">
+</figure>
+<figure class="w90" data-caption="Extrait de la matrice TF-IDF (une ligne par post, une colonne par terme)">
+<img src="../figures/algo_matrice.jpg" alt="">
+</figure>
+</section>
+
+<!-- =================================================================== -->
+<section class="chapter">
+<h1>Expériences et résultats</h1>
+<p>Toutes les valeurs de ce chapitre sont produites par le code du projet et recalculées par le script
+<code>scripts/verifier_resultats.py</code> ainsi que par les tests automatiques.</p>
+
+<h2>Expérience A : du texte au vecteur</h2>
+<p>Trois textes courts sont vectorisés seuls (<i>n</i> = 3) avec le même vectoriseur. Le terme <code>stade</code>
+apparaît dans deux textes : idf = ln(4/3) + 1 = 1,2877. Tous les autres termes n'apparaissent que dans un texte :
+idf = ln(4/2) + 1 = 1,6931.</p>
+<div class="tablewrap">
+<table class="bt" data-caption="Vecteurs TF-IDF normalisés de l'expérience A">
+<thead><tr><th>Texte</th><th class="r">football</th><th class="r">match</th><th class="r">stade</th><th class="r">voyage</th><th class="r">barcelone</th></tr></thead>
+<tbody>
+<tr><td>T1 « Le match de football au stade »</td><td class="r">0,6228</td><td class="r">0,6228</td><td class="r">0,4736</td><td class="r">0</td><td class="r">0</td></tr>
+<tr><td>T2 « Voyage au stade de Barcelone »</td><td class="r">0</td><td class="r">0</td><td class="r">0,4736</td><td class="r">0,6228</td><td class="r">0,6228</td></tr>
+<tr><td>T3 « Recette du tajine marocain »</td><td class="r">0</td><td class="r">0</td><td class="r">0</td><td class="r">0</td><td class="r">0</td></tr>
+</tbody>
+</table>
+</div>
+<p>Le seul terme commun à T1 et T2 est <code>stade</code>, donc cos(T1, T2) = 0,4736 × 0,4736 = <strong>0,2243</strong>.
+T3 (recette, tajine, marocain : 0,5774 chacun) ne partage aucun terme avec les deux autres : cos(T1, T3) = <strong>0</strong>.
+Le terme le plus répandu, <code>stade</code>, pèse moins que les termes rares.</p>
+
+<h2>Expérience B : le cosinus mesure le vocabulaire</h2>
+<p>Cette expérience compare des paires de publications du corpus.</p>
+<div class="tablewrap">
+<table class="bt" data-caption="Similarité cosinus entre paires de publications">
+<thead><tr><th>Paire</th><th class="r">Cosinus</th><th>Termes communs</th></tr></thead>
+<tbody>
+<tr><td>Deux posts football (p01, p04)</td><td class="r">0,1772</td><td>supporters, stade, match, équipe, football</td></tr>
+<tr><td>Foot entre amis / tournoi e-sport (p07, p25)</td><td class="r">0,2705</td><td>tournoi, dimanche</td></tr>
+<tr><td>« football » / « foot » (p01, p07)</td><td class="r">0,0000</td><td>aucun</td></tr>
+</tbody>
+</table>
+</div>
+<p>Deux posts sur le football réel sont <strong>moins</strong> similaires qu'un match entre amis et un tournoi de jeu vidéo,
+simplement parce que ces derniers partagent le mot « tournoi ». À l'inverse, p01 et p07 parlent tous deux de football mais
+leur cosinus est nul : l'un écrit « football », l'autre « foot ». Le cosinus mesure le <strong>vocabulaire partagé</strong>, pas le thème.</p>
+<figure class="w90" data-caption="Expérience B dans l'application : décomposition de cos(p01, p04)">
+<img src="../figures/exp_b.jpg" alt="">
+</figure>
+
+<h2>Expérience C : football puis voyage</h2>
+<p>L'utilisateur aime d'abord trois posts football (p01, p02, p03). Son profil est dominé par les termes
+<code>but</code> (0,226), <code>match</code> (0,217), <code>supporters</code> (0,217), <code>attaquant</code>,
+<code>championnat</code> et <code>joueur</code> (0,206). Le feed obtenu est le suivant :</p>
+<div class="tablewrap">
+<table class="bt" data-caption="Feed après trois likes football, puis après l'ajout d'un like voyage (p10)">
+<thead><tr><th class="c">Rang</th><th>3 likes football</th><th class="r">Score</th><th>+ like p10 (road trip au Maroc)</th><th class="r">Score</th></tr></thead>
+<tbody>
+<tr><td class="c">1</td><td>p04 Coupe d'Afrique (football)</td><td class="r">0,1484</td><td>p04 Coupe d'Afrique</td><td class="r">0,1306</td></tr>
+<tr><td class="c">2</td><td>p06 Ballon d'or (football)</td><td class="r">0,1161</td><td><strong>p09 Week-end à Barcelone ▲3</strong></td><td class="r">0,1155</td></tr>
+<tr><td class="c">3</td><td>p08 Mode carrière (gaming)</td><td class="r">0,1086</td><td>p06 Ballon d'or</td><td class="r">0,1021</td></tr>
+<tr><td class="c">4</td><td>p35 VAR et capteurs (techno.)</td><td class="r">0,0878</td><td>p08 Mode carrière</td><td class="r">0,0955</td></tr>
+<tr><td class="c">5</td><td>p09 Week-end à Barcelone (voyage)</td><td class="r">0,0845</td><td>p35 VAR et capteurs</td><td class="r">0,0772</td></tr>
+<tr><td class="c">6</td><td>p25 Tournoi e-sport (gaming)</td><td class="r">0,0668</td><td><strong>p15 Jemaa el-Fna (nouveau)</strong></td><td class="r">0,0723</td></tr>
+<tr><td class="c">7</td><td>p05 Entraînement du gardien</td><td class="r">0,0495</td><td>p25 Tournoi e-sport</td><td class="r">0,0588</td></tr>
+<tr><td class="c">8</td><td>p18 Pâtes crémeuses (cuisine)</td><td class="r">0,0292</td><td><strong>p14 Billets d'avion (nouveau)</strong></td><td class="r">0,0498</td></tr>
+</tbody>
+</table>
+</div>
+<p>Le score de p04 se décompose ainsi : supporters 0,0589 + match 0,0294 + stade 0,0218 + football 0,0197 + équipe 0,0187
+(et d'autres termes plus faibles), soit 0,148. La présence de <strong>p18, une recette de pâtes</strong>, dans un feed football
+s'explique par un seul terme commun : <code>rapide</code> (« attaquant rapide », « recette rapide »), qui contribue 0,0292.
+C'est un cas typique de <strong>polysémie</strong> : le modèle compte des mots, il n'en comprend pas le sens.</p>
+<p>Après l'ajout d'un seul like voyage (p10), la moyenne du profil se déplace. Le terme rare <code>désert</code> (0,199)
+passe en tête du profil. p09 (Barcelone), qui combine football et voyage, monte de la 5<sup>e</sup> à la 2<sup>e</sup> place ;
+p15 et p14 entrent dans le feed tandis que p05 et p18 en sortent.</p>
+<figure class="w90" data-caption="Feed après l'ajout du like voyage : p09 progresse de trois rangs">
+<img src="../figures/feed_voyage.jpg" alt="">
+</figure>
+
+<h2>Expérience D : exploration</h2>
+<p>Avec le profil football + voyage, les thèmes présents dans le top 8 sont football, voyage, gaming et technologie.
+Les thèmes absents sont donc <strong>cuisine</strong> et <strong>fitness</strong>.</p>
+<div class="tablewrap">
+<table class="bt" data-caption="Effet du taux d'exploration sur le feed (profil football + voyage)">
+<thead><tr><th class="c">Exploration</th><th class="c">Places</th><th>Posts d'exploration insérés</th><th>Positions</th></tr></thead>
+<tbody>
+<tr><td class="c">0 %</td><td class="c">0 / 8</td><td>aucun</td><td>—</td></tr>
+<tr><td class="c">25 %</td><td class="c">2 / 8</td><td>p18 Pâtes (cuisine, 0,026), p36 Programme débutant (fitness, 0,013)</td><td>4 et 8</td></tr>
+<tr><td class="c">50 %</td><td class="c">4 / 8</td><td>p18, p36, p21 Pain maison (cuisine), p38 Musculation (fitness)</td><td>2, 4, 6 et 8</td></tr>
+</tbody>
+</table>
+</div>
+<p>Les scores des posts d'exploration restent faibles et inchangés : la règle modifie <strong>l'affichage</strong>, pas le modèle.
+Elle introduit de la diversité au prix d'une pertinence moyenne plus faible.</p>
+<figure class="w90" data-caption="Feed avec 25 % d'exploration : deux places réservées à des thèmes absents">
+<img src="../figures/feed_exploration.jpg" alt="">
+</figure>
+
+<h2>Validation automatique</h2>
+<p>La justesse des calculs est vérifiée par <strong>44 tests pytest</strong>, qui passent tous. Ils couvrent notamment :</p>
+<ul class="dash">
+  <li>la normalisation des vecteurs (‖<b><i>x</i></b><sub><i>d</i></sub>‖ = 1) et la formule de l'idf ;</li>
+  <li>l'égalité entre cosinus et produit scalaire, et entre somme des contributions et score ;</li>
+  <li>l'exclusion des posts aimés, l'absence de doublons et les règles d'exploration ;</li>
+  <li>chaque effet annoncé dans la démonstration (par exemple « p09 passe de la 5<sup>e</sup> à la 2<sup>e</sup> place ») ;</li>
+  <li>le bon fonctionnement de l'interface, via l'outil de test <code>AppTest</code> de Streamlit.</li>
+</ul>
+<div class="listing" data-caption="Exécution des vérifications">
+<pre data-lang="sh">python -m pytest -q                    # 44 passed
+python scripts/verifier_resultats.py   # recalcule tous les chiffres cités</pre></div>
+</section>
+
+<!-- =================================================================== -->
+<section class="chapter">
+<h1>Analyse critique et limites</h1>
+
+<h2>Limites observées</h2>
+<p>Les expériences mettent en évidence plusieurs limites propres à une représentation par sac de mots :</p>
+<ul class="dash">
+  <li><strong>Synonymes :</strong> « foot » ≠ « football » ; cos(p01, p07) = 0 malgré un même sujet.</li>
+  <li><strong>Polysémie :</strong> le mot « rapide » fait entrer une recette de pâtes dans un feed football.</li>
+  <li><strong>Vocabulaire et non thème :</strong> un tournoi e-sport ressemble plus à un match entre amis (0,271)
+      que deux posts football entre eux (0,177).</li>
+  <li><strong>Pas de lemmatisation :</strong> « joueur » et « joueurs » sont deux termes différents.</li>
+  <li><strong>Vocabulaire figé :</strong> un mot absent du corpus n'existe pas pour le modèle.</li>
+  <li><strong>Profil naïf :</strong> tous les likes pèsent pareil ; un terme rare d'un seul post (« désert ») peut dominer le profil.</li>
+  <li><strong>Démarrage à froid et surspécialisation :</strong> sans like, aucune personnalisation ; avec des likes,
+      le feed se resserre sur ce qui ressemble au passé.</li>
+</ul>
+
+<h2>Portée de la démonstration</h2>
+<p>Il est important de distinguer ce que le simulateur illustre de ce qu'il ne prouve pas.</p>
+<ul class="dash">
+  <li><strong>Il illustre</strong> un mécanisme réel et complet : texte → vecteurs → profil → cosinus → classement,
+      entièrement explicable.</li>
+  <li><strong>Il ne reproduit pas</strong> l'algorithme de TikTok, d'Instagram ou d'une autre plateforme, qui reposent sur des
+      modèles appris sur des milliards d'interactions (temps de visionnage, partages…) et sur des objectifs d'engagement.</li>
+  <li><strong>Il ne prouve pas</strong> l'existence des bulles de filtre : un utilisateur fictif et 40 publications ne permettent
+      aucune conclusion scientifique.</li>
+  <li>Le score affiché est une <strong>similarité</strong>, pas une probabilité d'aimer.</li>
+</ul>
+<figure class="w60" data-caption="Onglet « Comprendre &amp; limites » de l'application">
+<img src="../figures/limites.jpg" alt="">
+</figure>
+
+<h2>Comparaison des approches</h2>
+<div class="tablewrap">
+<table class="bt" data-caption="Comparaison des familles de systèmes de recommandation" style="width:100%">
+<thead><tr><th>Critère</th><th>Basée sur le contenu</th><th>Filtrage collaboratif</th><th>Hybride</th></tr></thead>
+<tbody>
+<tr><td>Idée</td><td>Des contenus qui ressemblent à ceux aimés</td><td>Des contenus aimés par des utilisateurs proches</td><td>Combinaison des deux et d'autres signaux</td></tr>
+<tr><td>Données nécessaires</td><td>Texte des contenus, un seul utilisateur</td><td>Beaucoup d'utilisateurs et d'interactions</td><td>Les deux</td></tr>
+<tr><td>Explicabilité</td><td>Élevée (contributions des termes)</td><td>Moyenne</td><td>Faible à moyenne</td></tr>
+<tr><td>Nouveaux contenus</td><td>Recommandables immédiatement</td><td>Difficiles (aucune interaction)</td><td>Bien gérés</td></tr>
+<tr><td>Découverte</td><td>Faible (surspécialisation)</td><td>Bonne (goûts inattendus)</td><td>Bonne</td></tr>
+<tr><td>Utilisé ici</td><td>Oui</td><td>Non</td><td>Non</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Perspectives d'amélioration</h2>
+<ul class="dash">
+  <li>lemmatisation, dictionnaire de synonymes et n-grammes pour mieux capter le sens ;</li>
+  <li><strong>embeddings sémantiques</strong> (par exemple des modèles de type BERT) pour rapprocher « foot » et « football »,
+      au prix d'une explicabilité plus faible ;</li>
+  <li>pondération temporelle des likes et prise en compte de signaux négatifs (« pas intéressé ») ;</li>
+  <li>passage à un système <strong>hybride</strong> intégrant le filtrage collaboratif ;</li>
+  <li>mesure quantitative de la diversité du feed pour évaluer l'effet de l'exploration.</li>
+</ul>
+</section>
+
+<!-- =================================================================== -->
+<section class="chapter unnumbered" id="conclusion">
+<h1>Conclusion</h1>
+<p>Ce projet a permis de concevoir et de mettre en œuvre un moteur de recommandation basé sur le contenu,
+appliqué à un mini réseau social simulé.</p>
+<p>La première réalisation a consisté à transformer des publications en vecteurs : prétraitement du texte en français,
+puis pondération <strong>TF-IDF</strong> sur un vocabulaire de 564 termes. La deuxième a permis de représenter l'utilisateur
+par un <strong>profil</strong>, moyenne des publications aimées, et de classer les publications par <strong>similarité cosinus</strong>.
+Une règle d'exploration séparée vient enfin réserver une partie du feed à des thèmes absents.</p>
+<p>L'interface Streamlit rend chaque étape visible : un score peut toujours être décomposé en contributions de termes, et le code
+affiché est celui qui s'exécute. Les expériences ont montré à la fois l'efficacité du mécanisme (un seul like voyage suffit à
+réorganiser le feed) et ses limites (synonymes, polysémie, surspécialisation). 44 tests automatiques garantissent la
+reproductibilité de tous les résultats présentés.</p>
+<p>Ces expérimentations montrent qu'un feed n'a rien de magique : c'est un calcul, et ce calcul a des limites.
+Elles constituent une base claire pour aborder des approches plus avancées, comme les embeddings sémantiques et les systèmes hybrides.</p>
+</section>
+
+</div>
+<script src="numbering.js"></script>
+</body>
+</html>

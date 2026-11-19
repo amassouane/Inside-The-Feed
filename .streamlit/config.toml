@@ -1,0 +1,10 @@
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true
+address = "localhost"
+
+[theme]
+base = "light"
+primaryColor = "#6366f1"
