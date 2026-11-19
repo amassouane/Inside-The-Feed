@@ -102,7 +102,7 @@ def styled_matrix(df: pd.DataFrame):
 # --------------------------------------------------------------------------
 with st.sidebar:
     st.markdown("## 📡 Inside the Feed")
-    st.caption("Démonstrateur pédagogique — **données 100 % fictives**.")
+    st.caption("Démonstrateur interactif —**données 100 % fictives**.")
     st.toggle("🎤 Mode présentation", key="presentation")
 
     st.markdown("### 🎬 Scénarios")

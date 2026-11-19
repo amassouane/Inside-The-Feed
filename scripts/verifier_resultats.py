@@ -1,4 +1,4 @@
-"""Affiche tous les chiffres cités dans le corrigé et la démo, calculés sur le
+"""Affiche tous les chiffres cités dans la démo et la documentation, calculés sur le
 corpus final. Lancement : python scripts/verifier_resultats.py
 """
 import sys

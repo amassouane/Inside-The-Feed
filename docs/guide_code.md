@@ -54,7 +54,7 @@ on peut les tester et les expliquer sans interface.
 - `show_code(fn)` affiche le code source **réel** des fonctions avec `inspect.getsource` :
   ce qui est montré à l'écran est ce qui s'exécute.
 
-## Montrer le code pendant la présentation (≈ 3 min)
+## Les quatre fonctions essentielles
 
 1. `preprocess`, en 4 lignes, avec `analyzer=preprocess` dans `make_vectorizer`.
 2. `build_profile` : une moyenne puis une division.

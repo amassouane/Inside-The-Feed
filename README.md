@@ -1,6 +1,6 @@
 # 📡 Inside the Feed
 
-**Démonstrateur pédagogique d'un moteur de recommandation basé sur le contenu.**
+**Démonstrateur interactif d'un moteur de recommandation basé sur le contenu.**
 Inside the Feed simule un mini réseau social et montre, étape par étape, comment des **textes**
 et des **likes** deviennent un **feed personnalisé** grâce au NLP : prétraitement, vecteurs TF-IDF,
 profil utilisateur et similarité cosinus.
@@ -169,7 +169,7 @@ scikit-learn 1.9.1).
 
 ```bash
 python -m pytest -q                      # calculs, feed, exploration, scénarios, interfaces (AppTest)
-python scripts/verifier_resultats.py     # recalcule tous les chiffres cités dans les supports
+python scripts/verifier_resultats.py     # recalcule tous les chiffres des scénarios
 ```
 
 - `tests/test_recommender.py` : prétraitement, TF-IDF, profil, cosinus, contributions, feed, exploration.
@@ -202,10 +202,8 @@ docs/                       Mécanismes, guide du code, démo, questions/répons
 |---|---|
 | `docs/mecanismes.md` | Les formules et un exemple numérique minuscule |
 | `docs/guide_code.md` | L'ordre de lecture du code |
-| `docs/demo.md` | Le scénario de démonstration (5–7 min) |
-| `docs/questions_professeur.md` | Questions probables et réponses |
 
-**Par où commencer ?** `docs/demo.md` → `docs/mecanismes.md` → `docs/guide_code.md`.
+**Par où commencer ?** `docs/mecanismes.md` → `docs/guide_code.md`.
 
 ## Limites
 

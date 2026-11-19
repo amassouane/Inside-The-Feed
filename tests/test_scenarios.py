@@ -1,4 +1,4 @@
-"""Vérifie que les effets annoncés dans la démo et les supports sont VRAIS
+"""Vérifie que les effets annoncés dans la démo et la documentation sont VRAIS
 sur le corpus final. Si les données changent, ces tests échouent."""
 import pytest
 

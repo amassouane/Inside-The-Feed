@@ -3,10 +3,3 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .DS_Store
-
-# Documents tiers (travail du binôme précédent) — non publiés
-references/
-presentation/
-rapport/
-tp/
-Resume_InsideTheFeed.pdf
